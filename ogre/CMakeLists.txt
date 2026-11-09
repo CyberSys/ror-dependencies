@@ -48,11 +48,18 @@ ExternalProject_Add(
 
 if (WIN32)
     # By default the cg.dll is only installed in the build directory. Therefore manually copy it to the dependency output directory.
+    if (ROR_ARCHITECTURE STREQUAL "x64")
+        set(CG_BIN_DIR "bin64")
+        set(CG_LIB_DIR "lib64")
+    else ()
+        set(CG_BIN_DIR "bin")
+        set(CG_LIB_DIR "lib")
+    endif ()
     ExternalProject_Add_Step(
             ogre copy_cg
-            COMMAND ${CMAKE_COMMAND} -E copy_directory ${cgtoolkit_SOURCE_DIR}/bin64/ ${DEPENDENCIES_BIN_DIR}
+            COMMAND ${CMAKE_COMMAND} -E copy_directory ${cgtoolkit_SOURCE_DIR}/${CG_BIN_DIR}/ ${DEPENDENCIES_BIN_DIR}
             COMMAND ${CMAKE_COMMAND} -E copy_directory ${cgtoolkit_SOURCE_DIR}/include/ ${DEPENDENCIES_INCLUDE_DIR}
-            COMMAND ${CMAKE_COMMAND} -E copy_directory ${cgtoolkit_SOURCE_DIR}/lib64/ ${DEPENDENCIES_LIB_DIR}
+            COMMAND ${CMAKE_COMMAND} -E copy_directory ${cgtoolkit_SOURCE_DIR}/${CG_LIB_DIR}/ ${DEPENDENCIES_LIB_DIR}
             DEPENDEES configure
     )
 endif ()

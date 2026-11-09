@@ -41,6 +41,19 @@ project(ror-dependencies VERSION 30)
 
 
 # ------------------------------------------------------------------------------------------------#
+# Architecture selection (x64 preferred for modern MSVC)
+# ------------------------------------------------------------------------------------------------#
+if (NOT DEFINED ROR_ARCHITECTURE)
+    if (WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(ROR_ARCHITECTURE "x64" CACHE STRING "Target architecture" FORCE)
+    elseif (WIN32)
+        set(ROR_ARCHITECTURE "Win32" CACHE STRING "Target architecture" FORCE)
+    else ()
+        set(ROR_ARCHITECTURE "" CACHE STRING "Target architecture" FORCE)
+    endif ()
+endif ()
+
+# ------------------------------------------------------------------------------------------------#
 # Options to enable/disable building specific dependencies
 # ------------------------------------------------------------------------------------------------#
 
@@ -74,7 +87,7 @@ set_property(DIRECTORY PROPERTY EP_BASE ${CMAKE_BINARY_DIR})
 
 # Determine the name for the output directory where dependencies are going to be installed
 if (WIN32)
-    set(DEPENDENCIES_OUTPUT_DIR ${CMAKE_BINARY_DIR}/Dependencies_${CMAKE_SYSTEM_NAME}_${CMAKE_GENERATOR})
+    set(DEPENDENCIES_OUTPUT_DIR ${CMAKE_BINARY_DIR}/Dependencies_${CMAKE_SYSTEM_NAME}_${ROR_ARCHITECTURE}_${CMAKE_GENERATOR})
     string(REPLACE " " "-" DEPENDENCIES_OUTPUT_DIR ${DEPENDENCIES_OUTPUT_DIR})
 else ()
     set(DEPENDENCIES_OUTPUT_DIR ${CMAKE_BINARY_DIR}/Dependencies_${CMAKE_SYSTEM_NAME})
@@ -82,8 +95,8 @@ endif ()
 
 if (MSVC)
     set(DEPENDENCIES_INCLUDE_DIR ${DEPENDENCIES_OUTPUT_DIR}/include)
-    set(DEPENDENCIES_LIB_DIR ${DEPENDENCIES_OUTPUT_DIR}/lib)
-    set(DEPENDENCIES_BIN_DIR ${DEPENDENCIES_OUTPUT_DIR}/bin)
+    set(DEPENDENCIES_LIB_DIR ${DEPENDENCIES_OUTPUT_DIR}/lib/${ROR_ARCHITECTURE})
+    set(DEPENDENCIES_BIN_DIR ${DEPENDENCIES_OUTPUT_DIR}/bin/${ROR_ARCHITECTURE})
 else ()
     set(DEPENDENCIES_INCLUDE_DIR ${DEPENDENCIES_OUTPUT_DIR}/include)
     set(DEPENDENCIES_LIB_DIR ${DEPENDENCIES_OUTPUT_DIR}/lib/${CMAKE_BUILD_TYPE})
